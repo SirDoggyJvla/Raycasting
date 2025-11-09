@@ -7,7 +7,7 @@ class Line():
         self.end_point = end_point
 
     def copy(self):
-        return Line(self.grid, self.start_point, self.end_point)
+        return Line(self.grid, self.start_point.copy(), self.end_point.copy())
 
     def set_point(self, point_name, point):
         if point_name == "start":

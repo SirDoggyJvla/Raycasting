@@ -49,10 +49,9 @@ while running:
                     case pygame.K_q:
                         running = False
             case pygame.MOUSEMOTION:
+                # update mouse point
                 mouse_x, mouse_y = event.pos
-                MOUSE_POINT.set_xy((mouse_x, mouse_y)) # update mouse point
-                # print(f"Mouse moved to cell: ({cell_x}, {cell_y})")
-
+                MOUSE_POINT.set_xy((mouse_x, mouse_y))
 
 
     # Fill background
@@ -67,7 +66,6 @@ while running:
 
     # draw mouse cell
     grid.highlight_cell(MOUSE_POINT, GRAY)
-    ray.draw(screen, BLACK)
 
     # # draw text with the number of cells on the same square for each cells
     # count = {}
@@ -81,8 +79,11 @@ while running:
     # Draw grid
     grid.draw()
 
+    # draw ray
+    ray.draw(screen, BLACK)
+
     # draw text with cell coordinates
-    point = MOUSE_POINT.to_gridf()
+    point = MOUSE_POINT.to_grid()
     img = font.render(f"Cell: ({point[0]}, {point[1]})", True, BLACK)
     screen.blit(img, (10, 10))
 

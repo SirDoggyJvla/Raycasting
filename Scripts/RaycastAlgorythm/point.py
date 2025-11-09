@@ -13,6 +13,9 @@ class Point():
             self.x, self.y = xy
             self.i, self.j = grid.xy2ij(xy)
 
+    def copy(self):
+        return Point(self.grid, ij=(self.i, self.j))
+
     def set_ij(self, ij):
         self.i, self.j = ij
         self.x, self.y = self.grid.ij2xy(ij)
@@ -22,6 +25,7 @@ class Point():
         self.x, self.y = xy
         self.i, self.j = self.grid.xy2ij(xy)
         return self
+
 
     def to_real(self):
         """
@@ -40,4 +44,4 @@ class Point():
         Grid exact
         """
         GRID_SIZE = self.grid.grid_size
-        return (self.i // GRID_SIZE, self.j // GRID_SIZE)
+        return (self.x // GRID_SIZE, self.y // GRID_SIZE)
