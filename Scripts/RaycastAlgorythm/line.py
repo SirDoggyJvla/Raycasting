@@ -50,3 +50,10 @@ class Line():
     def get_angle(self):
         delta_i, delta_j = self.get_delta_gridf()
         return math.degrees(math.atan2(delta_j, delta_i))
+
+    @DeprecationWarning
+    def get_leftmost_point(self):
+        if self.start_point.i < self.end_point.i:
+            return self.start_point
+        else:
+            return self.end_point

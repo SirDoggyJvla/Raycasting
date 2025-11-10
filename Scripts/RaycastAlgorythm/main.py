@@ -61,8 +61,8 @@ while running:
     angle = RAY_LINE.set_point("end", MOUSE_POINT).get_angle()
     ray = Ray(grid, RAY_START_POS, MOUSE_POINT)
 
-    # cells = ray.cast(grid)
-    # grid.highlight_cells(cells, PINK)
+    cells = ray.cast(grid)
+    grid.highlight_cells(cells, PINK)
 
     # draw mouse cell
     grid.highlight_cell(MOUSE_POINT, GRAY)

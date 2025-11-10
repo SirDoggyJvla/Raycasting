@@ -30,9 +30,7 @@ class Grid():
 
     def highlight_cells(self, cells, highlight_color):
         for cell in cells:
-            cell_x, cell_y = cell
-            rect = pygame.Rect(cell_x * self.grid_size, cell_y * self.grid_size, self.grid_size, self.grid_size)
-            pygame.Surface.fill(self.screen, highlight_color, rect)
+            self.highlight_cell(cell, highlight_color)
 
     def highlight_cell(self, point: Point, highlight_color):
         cell_x, cell_y = point.to_grid()

@@ -12,6 +12,9 @@ class Point():
         else:
             self.x, self.y = xy
             self.i, self.j = grid.xy2ij(xy)
+    
+    def __repr__(self):
+        return f"Point({self.i:.2f}, {self.j:.2f})"
 
     def copy(self):
         return Point(self.grid, ij=(self.i, self.j))
