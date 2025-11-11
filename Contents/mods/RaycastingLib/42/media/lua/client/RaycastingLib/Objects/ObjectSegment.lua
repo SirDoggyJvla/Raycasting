@@ -42,6 +42,8 @@ end
 
 ---Used to check for the intersection of segment [AB] and segment [CD] (see [1]). The theorical intersection point is called (Px, Py).
 ---
+---For `vector` being a Vector3, we consider that the section is a plane perpendicular to the XY plane. Which is how we determine the Z coordinate of the intersection point.
+---
 ---[1]: https://en.wikipedia.org/wiki/Line–line_intersection
 ---@param start_point Point
 ---@param end_point Point
@@ -83,11 +85,14 @@ function ObjectSegment:testIntersection(start_point, end_point, vector)
     local z1, z2 = start_point.z, end_point.z
     local z
     if z1 ~= z2 then
+        -- we consider that a segment describes a wall, and the wall is 1 z unit tall + errorMargin
+        local BC = z2 - z1
+        if BC > 1+errorMargin then return false end
+
         local AD = math.sqrt((Px - x1)^2 + (Py - y1)^2)
         local AB = math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
-        local BC = z2 - z1
         z = z1 + (AD / AB) * BC
-    else
+    else -- most cases this is a ray as a Vector2
         z = z1
     end
 
