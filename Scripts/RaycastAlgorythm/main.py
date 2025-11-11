@@ -67,14 +67,14 @@ while running:
     # draw mouse cell
     grid.highlight_cell(MOUSE_POINT, GRAY)
 
-    # # draw text with the number of cells on the same square for each cells
-    # count = {}
-    # for cell in cells:
-    #     count[cell] = count.get(cell, 0) + 1
-    # for cell, c in count.items():
-    #     cell_x, cell_y = cell
-    #     img = font.render(f"{c}", True, BLACK)
-    #     screen.blit(img, grid.ij2xy((cell_x, cell_y)))
+    # draw text with the number of cells on the same square for each cells
+    count = {}
+    for cell in cells:
+        coord = cell.to_grid()
+        count[coord] = count.get(coord, 0) + 1
+    for coord, c in count.items():
+        img = font.render(f"{c}", True, BLACK)
+        screen.blit(img, grid.ij2xy(coord))
 
     # Draw grid
     grid.draw()

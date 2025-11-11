@@ -24,7 +24,7 @@ class Ray():
         end = line.end_point.to_real()
         pygame.draw.line(screen, color, start, end, 1)
 
-    def cast(self, grid):
+    def cast(self, grid, ):
         cells = []
 
         i0, j0 = self.start_point.to_gridf()
@@ -40,10 +40,15 @@ class Ray():
         else:
             step_i, step_j = direction_x * abs(1 / slope), direction_y * 1
 
+        temp = 12
+        step_i, step_j = step_i/temp, step_j/temp
+
         i1, j1 = (i0 + step_i), (j0 + step_j)
 
         while 0 <= i0 < grid.width and 0 <= j0 < grid.height:
-            cells.append(Point(grid, ij=(i0,j0)))
+            point = Point(grid, ij=(i0,j0))
+            if point not in cells:
+                cells.append(point)
             i0, j0 = i1, j1
             i1, j1 = (i0 + step_i), (j0 + step_j)
 

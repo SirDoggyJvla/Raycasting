@@ -1,0 +1,8 @@
+name=Raycasting Library
+id=RaycastingLib
+description=Raycasting Library is a modding library provided for modders to implement ray casting methods which can be used for tile collisions notably.
+poster=poster.png
+authors=SirDoggyJvla
+icon=poster.png
+url=https://ko-fi.com/sirdoggyjvla
+versionMin=42.12.3
