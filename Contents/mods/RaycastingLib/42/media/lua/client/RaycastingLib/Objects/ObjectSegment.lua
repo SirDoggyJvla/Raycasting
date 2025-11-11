@@ -85,13 +85,14 @@ function ObjectSegment:testIntersection(start_point, end_point, vector)
     local z1, z2 = start_point.z, end_point.z
     local z
     if z1 ~= z2 then
-        -- we consider that a segment describes a wall, and the wall is 1 z unit tall + errorMargin
         local BC = z2 - z1
-        if BC > 1+errorMargin then return false end
-
         local AD = math.sqrt((Px - x1)^2 + (Py - y1)^2)
         local AB = math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
-        z = z1 + (AD / AB) * BC
+        local ratio = (AD / AB) * BC
+        z = z1 + ratio
+
+        -- we consider that a segment describes a wall, and the wall is 1 z unit tall + errorMargin
+        if z - math.floor(z1) > 1 + errorMargin then return false end
     else -- most cases this is a ray as a Vector2
         z = z1
     end
