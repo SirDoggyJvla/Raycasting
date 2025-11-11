@@ -6,28 +6,29 @@ Consider the following diagram:
 
 - P the intersect point of the ray and the object segment
 - A and B the start and end points of the ray
-- D and B the projections of P and C on the z level of A
+- C and D the start and end points of the object segment
+- E and F the projections of P and B on the z level of A
 
 We have the following relation:
 $$
-\frac{AD}{AB} = \frac{AE}{AC} = \frac{DE}{BC}
+\frac{AF}{AE} = \frac{AP}{AB} = \frac{FP}{EB}
 $$
 
 We can derive from this the following formulas:
 $$
-DP = \frac{AD}{AB} BC
+FP = \frac{AF}{AE} EB
 $$
 
 With:
 $$
 \left\{ \begin{array}{lll}
-BC = z_C - z_A\\
-AD = \sqrt{(x_P - x_A)^2 + (y_P - y_A)^2}\\
-AB = \sqrt{(x_C - x_A)^2 + (y_C - y_A)^2}\\
+EB = z_B - z_A\\
+AF = \sqrt{(x_P - x_A)^2 + (y_P - y_A)^2}\\
+AE = \sqrt{(x_B - x_A)^2 + (y_B - y_A)^2}\\
 \end{array}\right.
 $$
 
 To finish:
 $$
-DP = \frac{\sqrt{(x_P - x_A)^2 + (y_P - y_A)^2}}{\sqrt{(x_C - x_A)^2 + (y_C - y_A)^2}} (z_C - z_A)
+FP = \frac{\sqrt{(x_P - x_A)^2 + (y_P - y_A)^2}}{\sqrt{(x_B - x_A)^2 + (y_B - y_A)^2}} (z_B - z_A)
 $$

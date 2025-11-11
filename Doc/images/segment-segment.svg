@@ -24,7 +24,7 @@
      inkscape:deskcolor="#000000"
      inkscape:document-units="mm"
      inkscape:zoom="2.8284271"
-     inkscape:cx="176.24636"
+     inkscape:cx="179.07479"
      inkscape:cy="97.050405"
      inkscape:window-width="1920"
      inkscape:window-height="987"
@@ -92,36 +92,14 @@
     <text
        xml:space="preserve"
        style="font-size:3.175px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
-       x="87.005577"
-       y="3.6843789"
-       id="text4"><tspan
-         sodipodi:role="line"
-         id="tspan4"
-         style="fill:#000000;fill-opacity:1;stroke-width:0.265"
-         x="87.005577"
-         y="3.6843789">C</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:3.175px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
-       x="87.268265"
-       y="43.698822"
+       x="88.110161"
+       y="4.9714675"
        id="text5"><tspan
          sodipodi:role="line"
          id="tspan5"
          style="fill:#000000;fill-opacity:1;stroke-width:0.265"
-         x="87.268265"
-         y="43.698822">B</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-size:3.175px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
-       x="63.714901"
-       y="43.786377"
-       id="text6"><tspan
-         sodipodi:role="line"
-         id="tspan6"
-         style="fill:#000000;fill-opacity:1;stroke-width:0.265"
-         x="63.714901"
-         y="43.786377">D</tspan></text>
+         x="88.110161"
+         y="4.9714675">B</tspan></text>
     <path
        style="fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.264999;stroke-opacity:1;marker-end:url(#Triangle)"
        d="M 7.2029137,40.317607 V 6.6416477"
@@ -137,5 +115,27 @@
          style="stroke-width:0.265"
          x="10.102788"
          y="7.9512682">z</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.264999;stroke-opacity:1"
+       x="87.463951"
+       y="43.217484"
+       id="text8"><tspan
+         sodipodi:role="line"
+         id="tspan8"
+         style="stroke-width:0.265"
+         x="87.463951"
+         y="43.217484">E</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;stroke:#000000;stroke-width:0.264999;stroke-opacity:1"
+       x="64.171417"
+       y="43.498112"
+       id="text9"><tspan
+         sodipodi:role="line"
+         id="tspan9"
+         style="stroke-width:0.265"
+         x="64.171417"
+         y="43.498112">F</tspan></text>
   </g>
 </svg>
