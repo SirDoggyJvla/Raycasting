@@ -1,5 +1,5 @@
 ---CACHE
-local GeometryObject = require "RaycastingLib/Objects/GeometryObject"
+local ObjectGeometryElement = require "RaycastingLib/Objects/ObjectGeometryElement"
 local math_min = math.min
 local math_max = math.max
 
@@ -7,7 +7,7 @@ local math_max = math.max
 ---@field start_point Point
 ---@field end_point Point
 ---@field errorMargin number
-local ObjectSegment = GeometryObject:derive("ObjectSegment")
+local ObjectSegment = ObjectGeometryElement:derive("ObjectSegment")
 
 ---Checks if the point (Px, Py) is within the segment [x1, y1] to [x2, y2]. `errorMargin` is used to expand the segment's bounding box to reduce error on segment to segment boundaries.
 ---@param Px any
@@ -114,7 +114,7 @@ end
 ---@param _errorMargin number?
 ---@return ObjectSegment
 function ObjectSegment:new(start_point, end_point, _errorMargin)
-    local o = GeometryObject:new() --[[@as ObjectSegment]]
+    local o = ObjectGeometryElement:new() --[[@as ObjectSegment]]
     setmetatable(o, self)
     self.__index = self
     o.start_point = start_point
