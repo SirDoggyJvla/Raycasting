@@ -1,0 +1,6 @@
+{
+    "Lua.workspace.library": [
+        "${addons}/umbrella-unstable/module/library"
+    ],
+    "Lua.workspace.checkThirdParty": false
+}
