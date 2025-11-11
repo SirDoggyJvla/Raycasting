@@ -91,7 +91,7 @@ function ObjectSegment:testIntersection(start_point, end_point, vector)
         local ratio = (AD / AB) * BC
         z = z1 + ratio
 
-        -- we consider that a segment describes a wall, and the wall is 1 z unit tall + errorMargin
+        -- we consider that a segment describes a full vertical wall, and the wall is 1 z unit tall + errorMargin
         if z - math.floor(z1) > 1 + errorMargin then return false end
     else -- most cases this is a ray as a Vector2
         z = z1
