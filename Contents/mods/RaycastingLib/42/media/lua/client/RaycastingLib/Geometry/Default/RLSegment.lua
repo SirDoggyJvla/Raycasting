@@ -1,5 +1,5 @@
 ---CACHE
-local RLElement = require "RaycastingLib/Objects/RLElement"
+local RLElement = require "RaycastingLib/Geometry/RLElement"
 local math_min = math.min
 local math_max = math.max
 

@@ -11,6 +11,7 @@ local isDebug = isDebugEnabled()
 ---@class Ray2D : ISUIElement
 ---@field public start_point Point
 ---@field public vector_beam Vector2
+---@field private geometryCollection GeometryCollection
 ---@field public end_point Point
 ---@field public ray_color ColorRGBA?
 ---@field public square_color ColorRGBA?
@@ -88,14 +89,24 @@ function Ray2D:update()
     local square = getSquare(c.x, c.y, c.z)
     if not square then return false end
 
-    print(square)
+    DebugLog.log("testing square "..tostring(square))
+
+    local geometryCollection = self.geometryCollection
 
     -- check first type of objects
     local objects = square:getObjects()
-
+    for i = 0, objects:size() - 1 do
+		local object = objects:get(i)
+        local test = geometryCollection:testObject(self, object)
+        if test then
+            DebugLog.log("Hit object:"..tostring(object))
+            DebugLog.log("Hit object:"..tostring(test))
+            return true
+        end
+    end
 
     -- check second type of objects
-    local objects = square:getSpecialObjects()
+    -- local objects = square:getSpecialObjects()
 
     return false
 end
@@ -107,7 +118,7 @@ function Ray2D:cast()
         -- Ray casting logic here
         interest = self:update()
     end
-    print("Ray casting finished")
+    DebugLog.log("Ray casting finished")
 end
 
 
@@ -187,6 +198,7 @@ function Ray2D:create()
     local vector_beam = self.vector_beam
     self:calculateEndPoint(start_point, vector_beam)
     self:populateSquares()
+    self.geometryCollection:create()
 end
 
 ---Update the vector beam and recreate the ray.
@@ -199,14 +211,16 @@ end
 ---comment
 ---@param start_point Point
 ---@param vector_beam Vector2
+---@param geometryCollection GeometryCollection
 ---@return Ray2D
-function Ray2D:new(start_point, vector_beam, _delta_length)
+function Ray2D:new(start_point, vector_beam, geometryCollection, _delta_length)
     local o = ISUIElement:new(0, 0, 0, 0) --[[@as Ray2D]]
     setmetatable(o, self)
     self.__index = self
 
     o.start_point = start_point
     o.vector_beam = vector_beam
+    o.geometryCollection = geometryCollection
 
     -- optional
     o.delta_length = _delta_length or 0.01

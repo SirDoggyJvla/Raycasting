@@ -21,7 +21,7 @@ module.OnKeyPressed = function(key)
 
             local vector_beam = player:getLastAngle():setLength(10)
 
-            module.ray = Ray2D:new(start_point, vector_beam)
+            module.ray = Ray2D:new(start_point, vector_beam, module.OBJECT_COLLECTIONS["WallLike"])
             module.ray:addToUIManager()
             module.ray:cast()
         end
