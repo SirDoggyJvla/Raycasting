@@ -1,5 +1,5 @@
 local ObjectGeometry = require "RaycastingLib/Geometry/ObjectGeometry"
-local RLSegment = require "RaycastingLib/Geometry/RLSegment"
+local RLSegment = require "RaycastingLib/Geometry/Default/RLSegment"
 
 local types = {
     ["WallN"] = {
