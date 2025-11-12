@@ -3,11 +3,11 @@ local module = require "RaycastingLib/module"
 
 ---@class ObjectGeometry : ISBaseObject
 ---@field id string
----@field elements table<number, ObjectGeometryElement>
+---@field elements table<number, RLElement>
 local ObjectGeometry = ISBaseObject:derive("ObjectGeometry")
 
 ---Add a new geometry element to check for ray intersections.
----@param element ObjectGeometryElement
+---@param element RLElement
 function ObjectGeometry:addElement(element)
     table.insert(self.elements, element)
 end
