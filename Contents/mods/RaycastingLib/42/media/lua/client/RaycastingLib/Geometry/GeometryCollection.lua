@@ -12,7 +12,7 @@ end
 
 ---Tests the given object by retrieving its geometry and testing if it intersects with the ray.
 ---@param object IsoObject
----@return boolean
+---@return any
 function GeometryCollection:testObject(ray, object)
     ---IMPLEMENT ME
     return false

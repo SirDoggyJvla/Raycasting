@@ -68,6 +68,26 @@ function Ray2D:render()
 
         addAreaHighlight(x, y, x+1, y+1, z, r, g, b, a)
     end
+
+
+    --- RENDER MARKERS
+    local markers = self.markers
+    for i = 1,#markers do
+        local marker = markers[i]
+        local x, y, z = marker.x, marker.y, marker.z
+        local sx = IsoUtils_XToScreen(x, y, z, 0)
+        local sy = IsoUtils_YToScreen(x, y, z, 0)
+
+        sx = sx - cameraX
+        sy = sy - cameraY - marker.y_offset
+
+        -- apply zoom
+        sx = sx / zoom
+        sy = sy / zoom
+        sy = sy - marker.height
+
+        marker.nametag:AddBatchedDraw(sx, sy, true)
+    end
 end
 
 ---[[=====================================]]
@@ -101,6 +121,7 @@ function Ray2D:update()
         if test then
             DebugLog.log("Hit object:"..tostring(object))
             DebugLog.log("Hit object:"..tostring(test))
+            self:addMarker(test, "Hit", 1, 0, 0, 1)
             return true
         end
     end
@@ -122,6 +143,23 @@ function Ray2D:cast()
 end
 
 
+
+function Ray2D:addMarker(point, text, r, g, b, a)
+    text = tostring(text) -- safeguard
+
+	local nametag = TextDrawObject.new()
+	nametag:ReadString(UIFont.Small, text, -1)
+    nametag:setDefaultColors(r or 1,g or 0,b or 0,a or 1)
+
+	table.insert(self.markers, {
+		x = point.x,
+		y = point.y,
+		z = point.z,
+        y_offset = 0,
+		nametag = nametag,
+        height = nametag:getHeight(),
+	})
+end
 
 
 
@@ -193,6 +231,7 @@ end
 function Ray2D:create()
     -- debug
     self.render_squares = {}
+    self.markers = {}
 
     local start_point = self.start_point
     local vector_beam = self.vector_beam
@@ -227,15 +266,16 @@ function Ray2D:new(start_point, vector_beam, geometryCollection, _delta_length)
 
     -- for debugging UI
     if isDebug then
-        self.x = 0
-        self.y = 0
-        self.width = getCore():getScreenWidth()
-        self.height = getCore():getScreenHeight()
+        o.x = 0
+        o.y = 0
+        o.width = 0
+        o.height = 0
 
-        self.ray_color = {r=1, g=1, b=0, a=1}
+        o.ray_color = {r=1, g=1, b=0, a=1}
 
         local color = getCore():getBadHighlitedColor()
-        self.square_color = {r=color:getR(), g=color:getG(), b=color:getB(), a=0.1}
+        o.square_color = {r=color:getR(), g=color:getG(), b=color:getB(), a=0.1}
+        o.markers = {}
     end
 
     -- initialize
