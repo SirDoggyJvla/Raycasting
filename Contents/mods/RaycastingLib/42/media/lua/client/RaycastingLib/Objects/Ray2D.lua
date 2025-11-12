@@ -99,7 +99,7 @@ end
 ---Returns true if the ray has finished casting (all squares checked, or ray was blocked), false otherwise.
 ---@public
 ---@return boolean
-function Ray2D:update()
+function Ray2D:updateRay()
     local squares = self.squares
     if #squares <= 0 then return true end
 
@@ -121,7 +121,7 @@ function Ray2D:update()
         if test then
             DebugLog.log("Hit object:"..tostring(object))
             DebugLog.log("Hit object:"..tostring(test))
-            self:addMarker(test, "Hit", 1, 0, 0, 1)
+            self:addMarker(test, "X", 1, 1, 1, 1)
             return true
         end
     end
@@ -134,10 +134,17 @@ end
 
 ---Cast the ray in a single frame.
 function Ray2D:cast()
+    print("cast")
     local interest = false
     while not interest do
+        print("casting...")
         -- Ray casting logic here
-        interest = self:update()
+        interest = self:updateRay()
+        if interest then
+            -- self.squares = {} -- clear remaining squares
+            break
+        end
+        print(interest)
     end
     DebugLog.log("Ray casting finished")
 end
