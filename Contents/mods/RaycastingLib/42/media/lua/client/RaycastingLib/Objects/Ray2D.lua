@@ -195,7 +195,10 @@ end
 --- CONSTRUCTOR
 ---[[=====================================]]
 
----Precalculate the squares to check during the cast using Amanatides algorithm.
+---Precalculate the squares to check during the cast using Amanatides algorithm [1, 2].
+---
+---[1] http://www.cse.yorku.ca/~amana/research/grid.pdf
+---[2] https://m4xc.dev/articles/amanatides-and-woo/
 function Ray2D:populateSquares()
     local squares = {}
     self.render_squares = {} -- for debug
