@@ -1,41 +1,52 @@
+---@namespace RaycastingLib
+
 local GeometryCollection = require "RaycastingLib/Geometry/GeometryCollection"
 local ObjectGeometry = require "RaycastingLib/Geometry/ObjectGeometry"
 local RLSegment = require "RaycastingLib/Geometry/Default/RLSegment"
 
+---Describes a collection of wall-like objects, such as walls, windows and doors.
+---@class WallLikeCollection : GeometryCollection
+---@field private validProperties IsoFlagType[]
+---@field private geometries table<IsoFlagType, ObjectGeometry>
+local WallLikeCollection = GeometryCollection:derive("WallLike")
+
+
+
+---@type table<IsoFlagType, {x: number, y: number, x_offset?: number, y_offset?: number}[]>
 local types = {
-    ["WallN"] = {
-        {1,0,y_offset = 0},
+    [IsoFlagType.WallN] = {
+        {x=1, y=0, y_offset = 0},
     },
-    ["WallW"] = {
-        {0,-1,y_offset = 1},
+    [IsoFlagType.WallW] = {
+        {x=0, y=-1, y_offset = 1},
     },
-    ["WallNW"] = {
-        {1,0,y_offset = 0},
-        {0,-1,y_offset = 1},
+    [IsoFlagType.WallNW] = {
+        {x=1, y=0, y_offset = 0},
+        {x=0, y=-1, y_offset = 1},
     },
-    ["WindowN"] = {
-        {1,0,y_offset = 0},
+    [IsoFlagType.WindowN] = {
+        {x=1, y=0, y_offset = 0},
     },
-    ["WindowW"] = {
-        {0,-1,y_offset = 1},
+    [IsoFlagType.WindowW] = {
+        {x=0, y=-1, y_offset = 1},
     },
-    ["DoorN"] = {
-        {1,0,y_offset = 0},
+    [IsoFlagType.DoorN] = {
+        {x=1, y=0, y_offset = 0},
     },
-    ["DoorW"] = {
-        {0,-1,y_offset = 1},
+    [IsoFlagType.DoorW] = {
+        {x=0, y=-1, y_offset = 1},
     },
 }
 
----@class WallLikeCollection : GeometryCollection
-local WallLikeCollection = GeometryCollection:derive("WallLike")
+
+
 for type, segments in pairs(types) do
     -- create geometry associated to the type
     local geometry = ObjectGeometry:new("WallLike_"..type)
     for i = 1, #segments do
         local seg = segments[i]
         local C = {x=seg.x_offset or 0, y=seg.y_offset or 0, z=0}
-        local D = {x=C.x + seg[1], y=C.y + seg[2], z=0}
+        local D = {x=C.x + seg.x, y=C.y + seg.y, z=0}
         local errorMargin = 0.05
         local segment = RLSegment:new(C, D, errorMargin)
         geometry:addElement(segment)
@@ -72,15 +83,16 @@ function WallLikeCollection:_getObjectType(object, spriteProperties)
 	return nil, nil
 end
 
+
 function WallLikeCollection:testObject(ray, object)
     local sprite = object:getSprite()
-    if not sprite then return nil end
+    if not sprite then return false end
 
     local spriteProperties = sprite:getProperties()
-    if not spriteProperties then return nil end
+    if not spriteProperties then return false end
 
     local objectProperty, geometry = self:_getObjectType(object, spriteProperties)
-    if not objectProperty or not geometry then return nil end
+    if not objectProperty or not geometry then return false end
 
     local start_point = ray.start_point
     local end_point = ray.end_point
@@ -89,3 +101,4 @@ function WallLikeCollection:testObject(ray, object)
     local test = geometry:testRayIntersection(start_point, end_point, vector, location)
     return test
 end
+

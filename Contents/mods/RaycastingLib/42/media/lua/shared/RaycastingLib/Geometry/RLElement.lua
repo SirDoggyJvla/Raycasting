@@ -1,6 +1,9 @@
+---@namespace RaycastingLib
+
 ---@class RLElement : ISBaseObject
 local RLElement = ISBaseObject:derive("RLElement")
 
+---@return Point|false
 function RLElement:testIntersection(...)
     -- IMPLEMENT ME
     return false

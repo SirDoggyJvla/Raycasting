@@ -1,3 +1,5 @@
+---@namespace RaycastingLib
+
 ---CACHE
 local RLElement = require "RaycastingLib/Geometry/RLElement"
 local math_min = math.min

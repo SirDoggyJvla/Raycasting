@@ -11,6 +11,8 @@ function BoxPanel:render()
 ]]
 
 
+---@namespace RaycastingLib
+
 
 ---CACHE
 local spriteRenderer = getRenderer()
@@ -31,7 +33,6 @@ local isDebug = isDebugEnabled()
 ---@field public square_color ColorRGBA?
 ---
 ---@field private squares Point[]
----@field private delta_length number
 ---
 ---@field private render_squares Point[]
 ---@field private markers {x: number, y: number, z: number, nametag: TextDrawObject, y_offset: number, height: number}[]
@@ -301,12 +302,12 @@ function Ray2D:setVectorBeam(vector_beam)
     self:create()
 end
 
----comment
+---Create a new ray element.
 ---@param start_point Point
 ---@param vector_beam Vector2
 ---@param geometryCollection GeometryCollection
 ---@return Ray2D
-function Ray2D:new(start_point, vector_beam, geometryCollection, _delta_length)
+function Ray2D:new(start_point, vector_beam, geometryCollection)
     local o = ISUIElement:new(0, 0, 0, 0) --[[@as Ray2D]]
     setmetatable(o, self)
     self.__index = self
@@ -314,9 +315,6 @@ function Ray2D:new(start_point, vector_beam, geometryCollection, _delta_length)
     o.start_point = start_point
     o.vector_beam = vector_beam
     o.geometryCollection = geometryCollection
-
-    -- optional
-    o.delta_length = _delta_length or 0.01
 
     -- for debugging UI
     if isDebug then

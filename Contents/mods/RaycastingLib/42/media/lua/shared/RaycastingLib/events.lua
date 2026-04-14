@@ -1,3 +1,5 @@
+---@namespace RaycastingLib
+
 local module = require "RaycastingLib/module"
 require "RaycastingLib/debug"
 

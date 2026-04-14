@@ -1,3 +1,5 @@
+---@namespace RaycastingLib
+
 if not isDebugEnabled() then return end
 
 ---CACHE

@@ -1,3 +1,5 @@
+---@namespace RaycastingLib
+
 ---CACHE
 local module = require "RaycastingLib/module"
 
@@ -11,8 +13,9 @@ function GeometryCollection:create()
 end
 
 ---Tests the given object by retrieving its geometry and testing if it intersects with the ray.
+---@param ray Ray2D
 ---@param object IsoObject
----@return any
+---@return Point|false
 function GeometryCollection:testObject(ray, object)
     ---IMPLEMENT ME
     return false

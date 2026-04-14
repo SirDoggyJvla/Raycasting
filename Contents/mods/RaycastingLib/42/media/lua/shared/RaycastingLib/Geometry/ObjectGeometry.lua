@@ -1,3 +1,5 @@
+---@namespace RaycastingLib
+
 ---CACHE
 local module = require "RaycastingLib/module"
 
@@ -6,6 +8,7 @@ local module = require "RaycastingLib/module"
 ---@field elements table<number, RLElement>
 local ObjectGeometry = ISBaseObject:derive("ObjectGeometry")
 
+---@return Point|false
 function ObjectGeometry:testRayIntersection(...)
     for i = 1, #self.elements do
         local element = self.elements[i]
