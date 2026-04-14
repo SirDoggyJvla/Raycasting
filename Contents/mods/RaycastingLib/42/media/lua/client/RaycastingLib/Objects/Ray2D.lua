@@ -30,8 +30,11 @@ local isDebug = isDebugEnabled()
 ---@field public ray_color ColorRGBA?
 ---@field public square_color ColorRGBA?
 ---
----@field private squares table<number, Point>
+---@field private squares Point[]
 ---@field private delta_length number
+---
+---@field private render_squares Point[]
+---@field private markers {x: number, y: number, z: number, nametag: TextDrawObject, y_offset: number, height: number}[]
 local Ray2D = ISUIElement:derive("Ray2D")
 
 
@@ -65,7 +68,9 @@ function Ray2D:render()
     local r,g,b,a = ray_color.r, ray_color.g, ray_color.b, ray_color.a
     ---@diagnostic disable-next-line: param-type-mismatch
     spriteRenderer:renderline(nil,
+        ---@diagnostic disable-next-line: param-type-mismatch
         sx1, sy1, -- start point
+        ---@diagnostic disable-next-line: param-type-mismatch
         sx2, sy2, -- end point
         r, g, b, a, 1
     )
@@ -108,7 +113,8 @@ end
 --- RAY CASTING
 ---[[=====================================]]
 
----Update the ray by casting to the next square. This can be called multiple times per frame or updates can be spread over multiple frames for performances.
+---Update the ray by casting to the next square. This can be called multiple times per frame 
+---or updates can be spread over multiple frames for performances.
 ---
 ---Returns true if the ray has finished casting (all squares checked, or ray was blocked), false otherwise.
 ---@public
@@ -118,7 +124,7 @@ function Ray2D:updateRay()
     if #squares <= 0 then return true end
 
     -- access next square and remove it
-    local c = squares[1]
+    local c = squares[1] --[[@as Point]]
     table.remove(squares, 1)
     local square = getSquare(c.x, c.y, c.z)
     if not square then return false end
@@ -191,11 +197,8 @@ end
 
 ---Precalculate the squares to check during the cast using Amanatides algorithm.
 function Ray2D:populateSquares()
-    local already_calculated = {}
-    ---@cast already_calculated table<number, table<number, table<number, true>>>
-
     local squares = {}
-    local render_squares = {}
+    self.render_squares = {} -- for debug
 
     -- cache
     local start_point = self.start_point
@@ -239,23 +242,13 @@ function Ray2D:populateSquares()
     end
 
     -- Track the parametric distance traveled
-    local t = 0
+    local t = 0.0
 
     -- Traverse grid cells
     while t < vlen do
-        -- Register this square
-        -- already_calculated[i] = already_calculated[i] or {}
-        -- if not already_calculated[i][j] then
-        --     already_calculated[i][j] = true
-        --     table.insert(squares, {x=i, y=j, z=z})
-        --     if isDebug then
-        --         table.insert(render_squares, {x=i, y=j, z=z})
-        --     end
-        -- end
-
         table.insert(squares, {x=i, y=j, z=z})
         if isDebug then
-            table.insert(render_squares, {x=i, y=j, z=z})
+            table.insert(self.render_squares, {x=i, y=j, z=z})
         end
 
         -- Step to next grid cell
@@ -272,7 +265,6 @@ function Ray2D:populateSquares()
 
     -- store results
     self.squares = squares
-    self.render_squares = render_squares
 end
 
 ---Calculate the end point.
