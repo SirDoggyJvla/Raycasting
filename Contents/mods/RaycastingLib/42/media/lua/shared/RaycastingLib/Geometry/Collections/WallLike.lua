@@ -68,7 +68,6 @@ end
 
 ---@param spriteProperties PropertyContainer
 function WallLikeCollection:_getObjectType(object, spriteProperties)
-    ---@type IsoObjectType|string just bcs Lua typing shows a warning when there shouldn't be one
     local _type = object:getType()
     _type = tostring(_type)
 
