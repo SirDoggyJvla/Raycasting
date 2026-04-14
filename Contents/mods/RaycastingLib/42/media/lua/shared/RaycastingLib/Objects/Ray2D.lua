@@ -10,105 +10,38 @@ function BoxPanel:render()
 
 ]]
 
+local isClientOrSP = isClient() or not isClient() and not isServer()
+
+
 
 ---@namespace RaycastingLib
 
 
 ---CACHE
-local spriteRenderer = getRenderer()
---functions
-local IsoUtils_XToScreen = IsoUtils.XToScreen
-local IsoUtils_YToScreen = IsoUtils.YToScreen
-local math_floor = math.floor
---debug
 local isDebug = isDebugEnabled()
 
 
----@class Ray2D : ISUIElement
----@field public start_point Point
----@field public vector_beam Vector2
----@field private geometryCollection GeometryCollection
----@field public end_point Point
----@field public ray_color ColorRGBA?
----@field public square_color ColorRGBA?
+---@class Ray2D
 ---
----@field private squares Point[]
+---The start point of the ray.
+---@field start_point Point
 ---
----@field private render_squares Point[]
----@field private markers {x: number, y: number, z: number, nametag: TextDrawObject, y_offset: number, height: number}[]
-local Ray2D = ISUIElement:derive("Ray2D")
+---The end point of the ray, calculated from the start point and the vector beam.
+---@field end_point Point
+---
+---The direction and length of the ray.
+---@field vector_beam Vector2
+---
+---Holds a collection of objects that will be used to test for intersection during the ray cast.
+---@field geometryCollection GeometryCollection
+---
+---Holds the coordinates of the squares to check during the ray cast. This is populated at ray creation using Amanatides algorithm.
+---@field square_points Point[]
+---
+---A debug renderer to visualize the ray and the squares being checked. Also used to show the impact point.
+---@field renderer Ray2DRenderer? -- only for client, nil on server
+local Ray2D = {}
 
-
----[[=====================================]]
---- RENDERING
----[[=====================================]]
-
-function Ray2D:render()
-    --- RENDER RAY
-    local zoom = getCore():getZoom(0)
-    local cameraX = IsoCamera.getOffX()
-	local cameraY = IsoCamera.getOffY()
-
-    local start_point = self.start_point
-    local end_point = self.end_point
-
-    local x1, y1, z1 = start_point.x, start_point.y, start_point.z
-    local x2, y2, z2 = end_point.x, end_point.y, end_point.z
-
-    local sx1 = IsoUtils_XToScreen(x1, y1, z1, 0)
-    local sy1 = IsoUtils_YToScreen(x1, y1, z1, 0)
-    local sx2 = IsoUtils_XToScreen(x2, y2, z2, 0)
-    local sy2 = IsoUtils_YToScreen(x2, y2, z2, 0)
-
-    sx1 = (sx1 - cameraX)/zoom
-    sy1 = (sy1 - cameraY)/zoom
-    sx2 = (sx2 - cameraX)/zoom
-    sy2 = (sy2 - cameraY)/zoom
-
-    local ray_color = self.ray_color --[[@as ColorRGBA]]
-    local r,g,b,a = ray_color.r, ray_color.g, ray_color.b, ray_color.a
-    ---@diagnostic disable-next-line: param-type-mismatch
-    spriteRenderer:renderline(nil,
-        ---@diagnostic disable-next-line: param-type-mismatch
-        sx1, sy1, -- start point
-        ---@diagnostic disable-next-line: param-type-mismatch
-        sx2, sy2, -- end point
-        r, g, b, a, 1
-    )
-
-
-    --- RENDER SQUARES
-    local squares = self.render_squares
-    for i = 1, #squares do
-        local c = squares[i]
-        local square = getSquare(c.x, c.y, c.z)
-        local x,y,z = square:getX(), square:getY(), square:getZ()
-        local color = self.square_color --[[@as ColorRGBA]]
-        local r,g,b,a = color.r, color.g, color.b, color.a
-
-        addAreaHighlight(x, y, x+1, y+1, z, r, g, b, a)
-    end
-
-
-    --- RENDER MARKERS
-    local markers = self.markers
-    for i = 1, #markers do
-        local marker = markers[i]
-        local x, y, z = marker.x, marker.y, marker.z
-        local sx = IsoUtils_XToScreen(x, y, z, 0)
-        local sy = IsoUtils_YToScreen(x, y, z, 0)
-
-        sx = sx - cameraX
-        sy = sy - cameraY - marker.y_offset
-
-        -- apply zoom
-        sx = sx / zoom
-        sy = sy / zoom
-        sy = sy - marker.height
-
-        marker.nametag:AddBatchedDraw(sx, sy, true)
-    end
-end
 
 ---[[=====================================]]
 --- RAY CASTING
@@ -118,15 +51,14 @@ end
 ---or updates can be spread over multiple frames for performances.
 ---
 ---Returns true if the ray has finished casting (all squares checked, or ray was blocked), false otherwise.
----@public
+---@param i number
 ---@return boolean
-function Ray2D:updateRay()
-    local squares = self.squares
-    if #squares <= 0 then return true end
+function Ray2D:updateRay(i)
+    local square_points = self.square_points
+    if #square_points < i then return true end
 
     -- access next square and remove it
-    local c = squares[1] --[[@as Point]]
-    table.remove(squares, 1)
+    local c = square_points[i] --[[@as Point]]
     local square = getSquare(c.x, c.y, c.z)
     if not square then return false end
 
@@ -136,12 +68,10 @@ function Ray2D:updateRay()
 
     -- check first type of objects
     local objects = square:getObjects()
-    for i = 0, objects:size() - 1 do
-		local object = objects:get(i)
+    for j = 0, objects:size() - 1 do
+		local object = objects:get(j)
         local test = geometryCollection:testObject(self, object)
         if test then
-            DebugLog.log("Hit object:"..tostring(object))
-            DebugLog.log("Hit object:"..tostring(test))
             self:addMarker(test, "X", 1, 1, 1, 1)
             return true
         end
@@ -155,41 +85,43 @@ end
 
 ---Cast the ray in a single frame.
 function Ray2D:cast()
-    print("cast")
     local interest = false
+    local i = 1
     while not interest do
         print("casting...")
         -- Ray casting logic here
-        interest = self:updateRay()
+        interest = self:updateRay(i)
         if interest then
             -- self.squares = {} -- clear remaining squares
             break
         end
-        print(interest)
+        i = i + 1
+        if i > 1000 then -- safeguard to prevent infinite loops during testing
+            DebugLog.log("Ray casting loop exceeded 1000 iterations, breaking to prevent infinite loop.")
+            break
+        end
     end
     DebugLog.log("Ray casting finished")
 end
 
 
 
+---@param point Point
+---@param text string
+---@param r number
+---@param g number
+---@param b number
+---@param a number
 function Ray2D:addMarker(point, text, r, g, b, a)
-    text = tostring(text) -- safeguard
-
-	local nametag = TextDrawObject.new()
-	nametag:ReadString(UIFont.Small, text, -1)
-    nametag:setDefaultColors(r or 1,g or 0,b or 0,a or 1)
-
-	table.insert(self.markers, {
-		x = point.x,
-		y = point.y,
-		z = point.z,
-        y_offset = 0,
-		nametag = nametag,
-        height = nametag:getHeight(),
-	})
+    if not self.renderer then return end
+    self.renderer:addMarker(point, text, r, g, b, a)
 end
 
-
+---@param point Point
+function Ray2D:addSquare(point)
+    if not self.renderer then return end
+    self.renderer:addSquare(point)
+end
 
 
 ---[[=====================================]]
@@ -201,8 +133,7 @@ end
 ---[1] http://www.cse.yorku.ca/~amana/research/grid.pdf
 ---[2] https://m4xc.dev/articles/amanatides-and-woo/
 function Ray2D:populateSquares()
-    local squares = {}
-    self.render_squares = {} -- for debug
+    local square_points = {}
 
     -- cache
     local start_point = self.start_point
@@ -215,23 +146,23 @@ function Ray2D:populateSquares()
     local vlen = math.sqrt(vx * vx + vy * vy)
     if vlen == 0 then return end
     
-    -- Normalize the direction vector
+    -- normalize the direction vector
     vx = vx / vlen
     vy = vy / vlen
 
-    -- Initialize step directions
+    -- initialize step directions
     local stepX = vx > 0 and 1 or -1
     local stepY = vy > 0 and 1 or -1
 
-    -- Calculate delta t values (parametric distance between grid lines)
+    -- calculate delta t values (parametric distance between grid lines)
     local tDeltaX = (vx ~= 0) and (1 / math.abs(vx)) or math.huge
     local tDeltaY = (vy ~= 0) and (1 / math.abs(vy)) or math.huge
 
-    -- Start in grid cell
-    local i = math_floor(x0)
-    local j = math_floor(y0)
+    -- start in grid cell
+    local i = math.floor(x0)
+    local j = math.floor(y0)
     
-    -- Calculate initial tMax values
+    -- calculate initial tMax values
     local tMaxX, tMaxY
     if stepX > 0 then
         tMaxX = (i + 1 - x0) * tDeltaX
@@ -245,17 +176,14 @@ function Ray2D:populateSquares()
         tMaxY = (y0 - j) * tDeltaY
     end
 
-    -- Track the parametric distance traveled
+    -- track the parametric distance traveled
     local t = 0.0
 
-    -- Traverse grid cells
+    -- traverse grid cells
     while t < vlen do
-        table.insert(squares, {x=i, y=j, z=z})
-        if isDebug then
-            table.insert(self.render_squares, {x=i, y=j, z=z})
-        end
+        table.insert(square_points, {x=i, y=j, z=z})
 
-        -- Step to next grid cell
+        -- step to next grid cell
         if tMaxX < tMaxY then
             t = tMaxX
             i = i + stepX
@@ -268,7 +196,7 @@ function Ray2D:populateSquares()
     end
 
     -- store results
-    self.squares = squares
+    self.square_points = square_points
 end
 
 ---Calculate the end point.
@@ -308,30 +236,24 @@ end
 ---@param geometryCollection GeometryCollection
 ---@return Ray2D
 function Ray2D:new(start_point, vector_beam, geometryCollection)
-    local o = ISUIElement:new(0, 0, 0, 0) --[[@as Ray2D]]
-    setmetatable(o, self)
-    self.__index = self
+	local o = {}
+	setmetatable(o, self)
+	self.__index = self
+
+    ---@cast o Ray2D
 
     o.start_point = start_point
     o.vector_beam = vector_beam
     o.geometryCollection = geometryCollection
 
-    -- for debugging UI
-    if isDebug then
-        o.x = 0
-        o.y = 0
-        o.width = 0
-        o.height = 0
-
-        o.ray_color = {r=1, g=1, b=0, a=1}
-
-        local color = getCore():getBadHighlitedColor()
-        o.square_color = {r=color:getR(), g=color:getG(), b=color:getB(), a=0.1}
-        o.markers = {}
-    end
-
     -- initialize
     o:create()
+
+    -- for debugging UI
+    if isClientOrSP then
+        o.renderer = require("RaycastingLib/Ray2DRenderer"):new(o)
+        o.renderer:addToUIManager()
+    end
 
     return o
 end

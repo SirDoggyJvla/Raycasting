@@ -42,7 +42,7 @@ local types = {
 
 for type, segments in pairs(types) do
     -- create geometry associated to the type
-    local geometry = ObjectGeometry:new("WallLike_"..type)
+    local geometry = ObjectGeometry:new("WallLike_"..tostring(type))
     for i = 1, #segments do
         local seg = segments[i]
         local C = {x=seg.x_offset or 0, y=seg.y_offset or 0, z=0}
