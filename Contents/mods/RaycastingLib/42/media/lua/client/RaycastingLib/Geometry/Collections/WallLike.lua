@@ -55,6 +55,7 @@ function WallLikeCollection:create()
 end
 
 
+---@param spriteProperties PropertyContainer
 function WallLikeCollection:_getObjectType(object, spriteProperties)
     ---@type IsoObjectType|string just bcs Lua typing shows a warning when there shouldn't be one
     local _type = object:getType()
@@ -63,7 +64,7 @@ function WallLikeCollection:_getObjectType(object, spriteProperties)
     local validProperties = self.validProperties
     for i = 1, #validProperties do
         local property = validProperties[i]
-        if spriteProperties:Is(property) or property == _type then
+        if spriteProperties:has(property) or property == _type then
             return property, self.geometries[property]
         end
     end

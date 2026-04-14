@@ -10,7 +10,7 @@ from line import Line
 pygame.init()
 
 # Screen dimensions
-WIDTH, HEIGHT = 800, 600
+WIDTH, HEIGHT = 800, 800
 GRID_SIZE = 40
 
 # Colors
@@ -31,7 +31,7 @@ grid = Grid(screen, WIDTH, HEIGHT, GRID_SIZE, GRAY)
 
 # default values
 mouse_x, mouse_y = 0, 0
-RAY_START_POS = Point(grid, xy=(WIDTH // 2, HEIGHT // 2))
+RAY_START_POS = Point(grid, ij=(3.3, 10.6))
 
 MOUSE_POINT = Point(grid, ij=(0, 0))
 RAY_LINE = Line(grid, RAY_START_POS, MOUSE_POINT)
@@ -61,7 +61,7 @@ while running:
     angle = RAY_LINE.set_point("end", MOUSE_POINT).get_angle()
     ray = Ray(grid, RAY_START_POS, MOUSE_POINT)
 
-    cells = ray.cast(grid)
+    cells = ray.cast_amanatides(grid)
     grid.highlight_cells(cells, PINK)
 
     # draw mouse cell

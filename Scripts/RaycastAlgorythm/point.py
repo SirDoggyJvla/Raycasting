@@ -1,7 +1,7 @@
 
 
 class Point():
-    def __init__(self, grid, ij=None, xy=None):
+    def __init__(self, grid, ij: tuple[float, float] | None = None, xy: tuple[float, float] | None = None):
         assert ij is not None or xy is not None, "Either ij or xy must be provided"
         
         self.grid = grid
@@ -9,7 +9,7 @@ class Point():
         if ij is not None:
             self.i, self.j = ij
             self.x, self.y = grid.ij2xy(ij)    
-        else:
+        elif xy is not None:
             self.x, self.y = xy
             self.i, self.j = grid.xy2ij(xy)
     
@@ -19,12 +19,12 @@ class Point():
     def copy(self):
         return Point(self.grid, ij=(self.i, self.j))
 
-    def set_ij(self, ij):
+    def set_ij(self, ij: tuple[float, float]):
         self.i, self.j = ij
         self.x, self.y = self.grid.ij2xy(ij)
         return self
 
-    def set_xy(self, xy):
+    def set_xy(self, xy: tuple[float, float]):
         self.x, self.y = xy
         self.i, self.j = self.grid.xy2ij(xy)
         return self

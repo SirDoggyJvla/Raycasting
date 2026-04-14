@@ -1,3 +1,17 @@
+--[[
+
+TO IMPLEMENT RAYCASTING WITH DEPTH MAP, SEE:
+https://discord.com/channels/908422782554107904/908422783049007116/1441167006236672043
+
+in vanilla code for box coordinate retrieve:
+```lua
+function BoxPanel:render()
+```
+
+]]
+
+
+
 ---CACHE
 local spriteRenderer = getRenderer()
 --functions
@@ -53,7 +67,7 @@ function Ray2D:render()
     spriteRenderer:renderline(nil,
         sx1, sy1, -- start point
         sx2, sy2, -- end point
-        r, g, b, a
+        r, g, b, a, 1
     )
 
 
@@ -72,7 +86,7 @@ function Ray2D:render()
 
     --- RENDER MARKERS
     local markers = self.markers
-    for i = 1,#markers do
+    for i = 1, #markers do
         local marker = markers[i]
         local x, y, z = marker.x, marker.y, marker.z
         local sx = IsoUtils_XToScreen(x, y, z, 0)
@@ -175,7 +189,7 @@ end
 --- CONSTRUCTOR
 ---[[=====================================]]
 
----Precalculate the squares to check during the cast.
+---Precalculate the squares to check during the cast using Amanatides algorithm.
 function Ray2D:populateSquares()
     local already_calculated = {}
     ---@cast already_calculated table<number, table<number, table<number, true>>>
@@ -186,36 +200,74 @@ function Ray2D:populateSquares()
     -- cache
     local start_point = self.start_point
     local vector_beam = self.vector_beam
-    local delta_length = self.delta_length
+    local z = start_point.z
 
-    local delta_vector = vector_beam:clone():setLength(self.delta_length)
-    local deltaX, deltaY = delta_vector:getX(), delta_vector:getY()
+    local x0, y0 = start_point.x, start_point.y
+    local vx, vy = vector_beam:getX(), vector_beam:getY()
+    
+    local vlen = math.sqrt(vx * vx + vy * vy)
+    if vlen == 0 then return end
+    
+    -- Normalize the direction vector
+    vx = vx / vlen
+    vy = vy / vlen
 
-    local x, y, z = start_point.x, start_point.y, start_point.z
+    -- Initialize step directions
+    local stepX = vx > 0 and 1 or -1
+    local stepY = vy > 0 and 1 or -1
 
-    -- iterate over the beam length
-    local beam_length = vector_beam:getLength()
-    while beam_length > 0 do
-        -- calculate next position along the ray
-        local x2, y2 = x + deltaX, y + deltaY
+    -- Calculate delta t values (parametric distance between grid lines)
+    local tDeltaX = (vx ~= 0) and (1 / math.abs(vx)) or math.huge
+    local tDeltaY = (vy ~= 0) and (1 / math.abs(vy)) or math.huge
 
-        -- floor to square coordinates
-        local x3, y3 = math_floor(x2), math_floor(y2)
+    -- Start in grid cell
+    local i = math_floor(x0)
+    local j = math_floor(y0)
+    
+    -- Calculate initial tMax values
+    local tMaxX, tMaxY
+    if stepX > 0 then
+        tMaxX = (i + 1 - x0) * tDeltaX
+    else
+        tMaxX = (x0 - i) * tDeltaX
+    end
+    
+    if stepY > 0 then
+        tMaxY = (j + 1 - y0) * tDeltaY
+    else
+        tMaxY = (y0 - j) * tDeltaY
+    end
 
-        -- verify if square was already calculated
-        already_calculated[x3] = already_calculated[x3] or {}
-        if not already_calculated[x3][y3] then
-            -- new square, register
-            already_calculated[x3][y3] = already_calculated[x3][y3] or true
-            table.insert(squares, {x=x3, y=y3, z=z})
-            if isDebug then
-                table.insert(render_squares, {x=x3, y=y3, z=z})
-            end
+    -- Track the parametric distance traveled
+    local t = 0
+
+    -- Traverse grid cells
+    while t < vlen do
+        -- Register this square
+        -- already_calculated[i] = already_calculated[i] or {}
+        -- if not already_calculated[i][j] then
+        --     already_calculated[i][j] = true
+        --     table.insert(squares, {x=i, y=j, z=z})
+        --     if isDebug then
+        --         table.insert(render_squares, {x=i, y=j, z=z})
+        --     end
+        -- end
+
+        table.insert(squares, {x=i, y=j, z=z})
+        if isDebug then
+            table.insert(render_squares, {x=i, y=j, z=z})
         end
 
-        -- update position
-        x, y = x2, y2
-        beam_length = beam_length - delta_length
+        -- Step to next grid cell
+        if tMaxX < tMaxY then
+            t = tMaxX
+            i = i + stepX
+            tMaxX = tMaxX + tDeltaX
+        else
+            t = tMaxY
+            j = j + stepY
+            tMaxY = tMaxY + tDeltaY
+        end
     end
 
     -- store results
